@@ -28,8 +28,8 @@
 ### 📁 Project Structure
 
 ### Starting the backend
-cd backend
-python3 -m venv env
-source env/bin/activate        # Use `env\Scripts\activate` on Windows
-pip install -r requirements.txt
-python3 app.py
+- cd backend
+- python3 -m venv env
+- source env/bin/activate        # Use `env\Scripts\activate` on Windows
+- pip install -r requirements.txt
+- python3 app.py
