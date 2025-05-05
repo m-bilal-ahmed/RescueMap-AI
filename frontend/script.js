@@ -1,9 +1,14 @@
 const map = L.map('map').setView([28.5383, -81.3792], 6);  // Orlando, FL default
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// Fetch reports
+// Fetch and display reports on page load
 fetch("/reports")
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
+    }
+    return res.json();
+  })
   .then(data => {
     data.forEach(report => {
       L.marker([report.lat, report.lon])
@@ -11,36 +16,54 @@ fetch("/reports")
         .bindPopup(`<b>${report.message}</b><br>${report.timestamp}`);
     });
   })
-  .catch(error => console.error('Error:', error));
+  .catch(error => console.error('Error fetching reports:', error));
 
 // Form submission
 document.getElementById("report-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const message = document.getElementById("message").value;
-  const lat = parseFloat(document.getElementById("lat").value);
-  const lon = parseFloat(document.getElementById("lon").value);
 
-  if (isNaN(lat) || isNaN(lon)) {
+  // Collect form data
+  const payload = {
+    message: document.getElementById("message").value,
+    lat: parseFloat(document.getElementById("lat").value),
+    lon: parseFloat(document.getElementById("lon").value),
+  };
+
+  // Validate coordinates
+  if (isNaN(payload.lat) || isNaN(payload.lon)) {
     alert("Please enter valid numeric coordinates.");
     return;
   }
 
-  fetch("/submit", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message, lat, lon })
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Submitted:", data);
-      // Add marker immediately
-      L.marker([lat, lon])
-        .addTo(map)
-        .bindPopup(`<b>${message}</b><br>Just submitted`);
-      // Clear form
-      document.getElementById("report-form").reset();
-    })
-    .catch(error => console.error("Error submitting report:", error));
+  try {
+    const response = await fetch("/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Submitted:", data);
+
+    // Add marker to map
+    L.marker([payload.lat, payload.lon])
+      .addTo(map)
+      .bindPopup(`<b>${payload.message}</b><br>Just submitted`)
+      .openPopup(); // Open popup immediately
+
+    // Optionally pan map to new marker
+    map.panTo([payload.lat, payload.lon]);
+
+    // Clear form
+    document.getElementById("report-form").reset();
+  } catch (error) {
+    console.error("Error submitting report:", error);
+    alert("Failed to submit report. Please try again.");
+  }
 });
