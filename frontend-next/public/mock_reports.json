@@ -1,0 +1,42 @@
+[
+  {
+    "message": "Flooding reported near downtown Orlando",
+    "lat": 28.5383,
+    "lon": -81.3792,
+    "category": "flooding",
+    "verified": false,
+    "timestamp": "2025-10-18T14:10:00Z"
+  },
+  {
+    "message": "Medical aid requested near Tampa General Hospital",
+    "lat": 27.9428,
+    "lon": -82.4584,
+    "category": "medical",
+    "verified": true,
+    "timestamp": "2025-10-18T14:30:00Z"
+  },
+  {
+    "message": "Power outage affecting residential area in Tallahassee",
+    "lat": 30.4383,
+    "lon": -84.2807,
+    "category": "power",
+    "verified": false,
+    "timestamp": "2025-10-18T15:00:00Z"
+  },
+  {
+    "message": "Supplies needed in Jacksonville shelter",
+    "lat": 30.3322,
+    "lon": -81.6557,
+    "category": "supply",
+    "verified": true,
+    "timestamp": "2025-10-18T15:15:00Z"
+  },
+  {
+    "message": "Collapsed building reported near Miami-Dade",
+    "lat": 25.7617,
+    "lon": -80.1918,
+    "category": "medical",
+    "verified": false,
+    "timestamp": "2025-10-18T15:45:00Z"
+  }
+]
