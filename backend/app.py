@@ -1,8 +1,12 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
+from twilio.twiml.messaging_response import MessagingResponse
+from dotenv import load_dotenv
 import os
 import logging
+
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -47,6 +51,18 @@ def serve_static(path):
         return jsonify({"error": f"File {path} not found"}), 404
     app.logger.debug(f"Serving static file from {file_path}")
     return send_from_directory(FRONTEND_DIR, path)
+
+@app.route("/sms", methods=["POST"])
+def sms():
+    body = request.form.get("Body")
+    sender = request.form.get("From")
+
+    print(f"📨 SMS from {sender}: {body}")
+
+    # Send auto-response
+    resp = MessagingResponse()
+    resp.message("✅ Your report has been received. Thank you!")
+    return str(resp)
 
 if __name__ == "__main__":
     # Log frontend directory for debugging
