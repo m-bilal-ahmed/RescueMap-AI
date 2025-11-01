@@ -43,7 +43,7 @@ export default function MapView({ filters, onLoaded, onSelect }: MapViewProps) {
     // Create map
     const map = L.map(elRef.current).setView([27.9944, -81.7603], 6);
 
-    // Make sure Leaflet knows its size in the grid
+    // Make sure Leaflet knows its size in the positioned parent
     setTimeout(() => {
       try {
         map.invalidateSize(true);
@@ -51,7 +51,6 @@ export default function MapView({ filters, onLoaded, onSelect }: MapViewProps) {
     }, 0);
 
     const handleResize = () => {
-      // _loaded is true only if Leaflet finished init
       // @ts-ignore
       if (!(map as any)?._loaded) return;
       try {
@@ -84,8 +83,6 @@ export default function MapView({ filters, onLoaded, onSelect }: MapViewProps) {
     }
 
     function draw(list: Report[]) {
-      // We are not filtering by category or verify yet,
-      // we will add that later, step by step.
       list.forEach((report) => {
         if (typeof report.lat !== "number" || typeof report.lon !== "number") {
           return;
@@ -104,16 +101,13 @@ export default function MapView({ filters, onLoaded, onSelect }: MapViewProps) {
         });
       });
 
-      // update header timestamp
       const updated = document.getElementById("lastUpdated");
       if (updated) {
         updated.textContent =
           "Last updated, " + new Date().toLocaleString();
       }
 
-      // bubble data up to parent so KPIs can update
       setTimeout(() => onLoaded(list), 100);
-      //onLoaded(list);
     }
 
     async function drawFromMock() {
@@ -129,15 +123,12 @@ export default function MapView({ filters, onLoaded, onSelect }: MapViewProps) {
       }
     }
 
-    // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize as any);
       try {
         map.remove();
       } catch {}
     };
-    // we intentionally do NOT include filters in deps here
-    // if we do, React will remount the map every time filter changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -146,11 +137,8 @@ export default function MapView({ filters, onLoaded, onSelect }: MapViewProps) {
       id="map"
       ref={elRef}
       style={{
-        height: "76vh",
-        width: "100%",
-        borderRadius: 16,
-        border: "1px solid #1f2a44",
-        overflow: "hidden"
+        position: "absolute",
+        inset: 0
       }}
     />
   );

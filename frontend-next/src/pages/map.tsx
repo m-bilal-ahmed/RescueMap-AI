@@ -18,7 +18,6 @@ type MapViewProps = {
   onSelect: (r: Report | null) => void;
 };
 
-// dynamic import with proper props typing
 const MapView = dynamic<MapViewProps>(
   () => import("../components/MapView"),
   { ssr: false }
@@ -44,13 +43,15 @@ export default function MapPage() {
 
   return (
     <div className="container">
+      {/* header row */}
       <div className="space-between" style={{ marginBottom: 12 }}>
-        <h2 style={{ margin: 0 }}>Live Map</h2>
+        <h2 style={{ margin: 0 }}>RescueMap-AI, Live Map</h2>
         <small className="small" id="lastUpdated">
           Last updated, just now
         </small>
       </div>
 
+      {/* KPI cards row */}
       <div
         className="section"
         style={{
@@ -74,9 +75,17 @@ export default function MapPage() {
         </div>
       </div>
 
-      <div className="map-wrap section" style={{ marginTop: 12 }}>
-        {/* Sidebar */}
-        <aside className="sidebar">
+      {/* MAP AREA */}
+      <div className="map-wrap">
+        {/* Map, full-bleed background in this container */}
+        <MapView
+          filters={filters}
+          onLoaded={setReports}
+          onSelect={setSelected}
+        />
+
+        {/* Left floating panel, filters and simulate */}
+        <aside className="sidebar-float">
           <div className="field">
             <label>Category</label>
             <select
@@ -97,7 +106,9 @@ export default function MapPage() {
             <label>Verification</label>
             <select
               value={filters.verify}
-              onChange={e => setFilters(p => ({ ...p, verify: e.target.value }))}
+              onChange={e =>
+                setFilters(p => ({ ...p, verify: e.target.value }))
+              }
             >
               <option value="">All</option>
               <option value="true">Verified only</option>
@@ -109,7 +120,9 @@ export default function MapPage() {
             <label>Time window</label>
             <select
               value={filters.time}
-              onChange={e => setFilters(p => ({ ...p, time: e.target.value }))}
+              onChange={e =>
+                setFilters(p => ({ ...p, time: e.target.value }))
+              }
             >
               <option value="any">Any</option>
               <option value="6h">Last 6 hours</option>
@@ -132,17 +145,8 @@ export default function MapPage() {
           </button>
         </aside>
 
-        {/* Map */}
-        <section>
-          <MapView
-            filters={filters}
-            onLoaded={setReports}
-            onSelect={setSelected}
-          />
-        </section>
-
-        {/* Drawer */}
-        <aside className="drawer">
+        {/* Right floating panel, report summary */}
+        <aside className="drawer-float">
           <div className="space-between" style={{ marginBottom: 8 }}>
             <div style={{ fontWeight: 700 }}>Report summary</div>
             <button className="btn ghost" onClick={() => setSelected(null)}>
@@ -157,19 +161,20 @@ export default function MapPage() {
           {selected && (
             <div style={{ display: "grid", gap: 8 }}>
               <div style={{ fontWeight: 700 }}>{selected.message}</div>
+
               <div className="row small">
-                <span
-                  className={`badge ${badgeColor(selected.category)}`}
-                >
+                <span className={`badge ${badgeColor(selected.category)}`}>
                   {selected.category || "other"}
                 </span>
                 <span className="badge">
                   {selected.verified ? "verified" : "unverified"}
                 </span>
               </div>
+
               <div className="small">
                 Lat {selected.lat.toFixed(4)}, Lon {selected.lon.toFixed(4)}
               </div>
+
               <div className="small">
                 {selected.timestamp
                   ? new Date(selected.timestamp).toLocaleString()
