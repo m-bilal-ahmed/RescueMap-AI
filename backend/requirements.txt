@@ -2,3 +2,6 @@ flask
 flask-cors
 scikit-learn
 nltk
+python-dotenv
+twilio
+gunicorn
